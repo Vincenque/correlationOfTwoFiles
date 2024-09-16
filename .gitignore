@@ -1,0 +1,5 @@
+build
+src/.vscode/
+.git
+.vscode
+settings.txt
