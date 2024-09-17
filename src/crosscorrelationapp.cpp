@@ -178,7 +178,9 @@ void CrossCorrelationApp::calculate() {
         std::cout << "Reading IQ samples from file2...\n";
         read_iq_samples(file2.toStdString(), iq_samples2, startSample, numSamples);
 
-        calculate_crosscorrelation(iq_samples1, iq_samples2, crosscorr_result, std::thread::hardware_concurrency());
+        std::vector<std::complex<float>> result_ch1_ch2(2 * numSamples - 1);
+
+        calculate_crosscorrelation(iq_samples1, iq_samples2, result_ch1_ch2, std::thread::hardware_concurrency());
         std::cout << "Cross-correlation between file1 and file2 complete.\n";
 
         // Find the peak correlation shift for each pair
@@ -188,8 +190,6 @@ void CrossCorrelationApp::calculate() {
             });
             return std::distance(result.begin(), max_it) - (result.size() / 2);
         };
-
-        std::vector<std::complex<float>> result_ch1_ch2(2 * numSamples - 1);
 
         int shift_ch1_ch2 = find_peak_shift(result_ch1_ch2);
 
@@ -201,6 +201,7 @@ void CrossCorrelationApp::calculate() {
         std::vector<float> magnitude_result_ch1_ch2(result_ch1_ch2.size());
 
         for (size_t i = 0; i < result_ch1_ch2.size(); ++i) {
+            std::cout << "i=" << i << " >> " << result_ch1_ch2[i] << std::endl;
             magnitude_result_ch1_ch2[i] = std::abs(result_ch1_ch2[i]);
         }
 
